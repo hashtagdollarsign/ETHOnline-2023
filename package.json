@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@tableland/sdk": "^4.5.3-dev.0"
+  }
+}
