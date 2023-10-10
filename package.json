@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@tableland/sdk": "^4.5.3-dev.0"
+    "@tableland/sdk": "^4.5.3-dev.0",
+    "ethers": "^6.7.1"
   }
 }

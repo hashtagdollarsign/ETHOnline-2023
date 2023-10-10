@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
     "module": "ES2022",
-    "target": "ESNext",
+    "target": "ES2022",
     "sourceMap": true,
-    "moduleResolution": "node",
+    "strict": false,
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
+    "esModuleInterop": true,
+    "types": [],
+    "moduleResolution": "node"
   },
-  "exclude": [
-    "node_modules"
-  ],
+  "include": ["backend/**/*.ts"],
+
 }
