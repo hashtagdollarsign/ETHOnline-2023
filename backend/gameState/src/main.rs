@@ -1,7 +1,7 @@
+mod events;
 
-
-
-use lambda_http::{run, service_fn, Body, Error, Request, RequestExt, Response, IntoResponse};
+use lambda_http::{run, service_fn, Error, Request, Response, IntoResponse};
+use serde_json::json;
 
 /// This is the main body for the function.
 /// Write your code inside it.
@@ -16,7 +16,7 @@ async fn function_handler(event: Request) -> Result<impl IntoResponse, Error> {
     let resp = Response::builder()
         .status(200)
         .header("content-type", "application/json")
-        .body("noting yet!")
+        .body(json!({ "message": format!("Not Yet!") }).to_string())
         .map_err(Box::new)?;
     Ok(resp)
 }
