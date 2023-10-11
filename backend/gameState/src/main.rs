@@ -1,4 +1,4 @@
-mod scores;
+
 
 
 use lambda_http::{run, service_fn, Body, Error, Request, RequestExt, Response, IntoResponse};
@@ -9,16 +9,14 @@ use lambda_http::{run, service_fn, Body, Error, Request, RequestExt, Response, I
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
 async fn function_handler(event: Request) -> Result<impl IntoResponse, Error> {
 
-    let table_name = "scores_sep_11155111_88";
-    //let table_name = "healthbot_80001_1";
-    let scores = scores::get_scores(table_name).await?;
+
 
     // Return something that implements IntoResponse.
     // It will be serialized to the right response event automatically by the runtime
     let resp = Response::builder()
         .status(200)
         .header("content-type", "application/json")
-        .body(scores.to_string())
+        .body("noting yet!")
         .map_err(Box::new)?;
     Ok(resp)
 }
