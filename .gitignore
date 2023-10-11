@@ -28,3 +28,15 @@ package-lock.json
 *.bak
 *.swp
 *.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear on external disks
+.Spotlight-V100
+.Trashes
