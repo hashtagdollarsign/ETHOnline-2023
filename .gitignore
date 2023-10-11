@@ -1,2 +1,30 @@
 node_modules/
 package-lock.json
+**/node_modules/
+# Environment variables
+.env
+.env.*
+*.env
+
+# Private key files
+*.pem
+*.key
+*.p12
+*.pkcs12
+*.pfx
+
+# Database
+*.sqlite
+
+# Configuration files that might contain secrets
+*.conf
+*.cfg
+*.config
+*.yml
+*.yaml
+
+# Other
+*.log
+*.bak
+*.swp
+*.swo
