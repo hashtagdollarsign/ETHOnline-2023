@@ -46,32 +46,33 @@ const postScore = async (tableName: string, score: number) => {
 }
 
 interface GameResult {
-    player1Address: string,
-    player2Address: string,
+    player_1_address: string,
+    player_2_address: string,
     winner: string, // Address of the winner
-    winnerScore: number,
-    loserScore: number,
+    winner_score: number,
+    loser_score: number,
 }
 const postVersusBattle = async (tableName: string, gameResult: GameResult)=> {
-    const nextId = getNextId(tableName);
     // Grab the provider from the browser
     // Look into replacing this with more generic provider
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
     const player_address = provider.getSigner();
-
+    const nextId = getNextId(tableName);
     let sql = postBuilder(tableName, gameResult)
     await db.prepare(sql)
-        .bind(Object.keys(gameResult))
+        .bind(nextId, Object.keys(gameResult))
         .run();
 }
 
 const postBuilder = (tableName: string, insertObj: {}) => {
     const keys = Object.keys(insertObj).join(', ');
     const values = Object.keys(insertObj).map(() => '?').join(', ');
-    let postString = 'INSERT INTO ${tableName} ({keys}) VALUES ({values});';
+
+    // Every Post Excepts an ID field.
+    let postString = 'INSERT INTO ${tableName} (ID,{keys}) VALUES (?,{values});';
     console.log(postString);
     return postString;
 }
 
-export {getScores, postScore}
+export {getScores, postScore, postVersusBattle}
