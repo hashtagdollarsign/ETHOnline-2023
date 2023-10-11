@@ -40,3 +40,6 @@ package-lock.json
 # Files that might appear on external disks
 .Spotlight-V100
 .Trashes
+
+# Next.js build output
+.next/
