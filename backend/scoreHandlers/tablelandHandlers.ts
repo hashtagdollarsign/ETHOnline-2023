@@ -40,9 +40,38 @@ const postScore = async (tableName: string, score: number) => {
     await provider.send("eth_requestAccounts", []);
     const player_address = provider.getSigner();
 
-    const {meta: insert} = await db.prepare('INSERT INTO ${tableName} (id, address, score) VALUES (?,?,?);')
+    await db.prepare('INSERT INTO ${tableName} (id, address, score) VALUES (?,?,?);')
         .bind(nextId, player_address.getAddress(), score)
         .run();
+}
+
+interface GameResult {
+    player1Address: string,
+    player2Address: string,
+    winner: string, // Address of the winner
+    winnerScore: number,
+    loserScore: number,
+}
+const postVersusBattle = async (tableName: string, gameResult: GameResult)=> {
+    const nextId = getNextId(tableName);
+    // Grab the provider from the browser
+    // Look into replacing this with more generic provider
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const player_address = provider.getSigner();
+
+    let sql = postBuilder(tableName, gameResult)
+    await db.prepare(sql)
+        .bind(Object.keys(gameResult))
+        .run();
+}
+
+const postBuilder = (tableName: string, insertObj: {}) => {
+    const keys = Object.keys(insertObj).join(', ');
+    const values = Object.keys(insertObj).map(() => '?').join(', ');
+    let postString = 'INSERT INTO ${tableName} ({keys}) VALUES ({values});';
+    console.log(postString);
+    return postString;
 }
 
 export {getScores, postScore}
