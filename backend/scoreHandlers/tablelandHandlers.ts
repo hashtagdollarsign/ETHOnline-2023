@@ -1,24 +1,8 @@
 import { Database } from "@tableland/sdk";
-// import { Signer } from "ethers";
+import { ethers } from "ethers";
 
 declare const window: any;
 
-// async function connectSigner(): Promise<Signer> {
-//     // Establish a connection with the browser wallet's provider.
-//     const provider = new window.ethereum;
-//     // Request the connected accounts, prompting a browser wallet popup to connect.
-//     await provider.send("eth_requestAccounts", []);
-//     // Create a signer from the returned provider connection.
-//     const signer = provider.getSigner();
-//     // Return the signer
-//     return signer;
-// }
-
-interface Scores {
-    id: number;
-    address: string;
-    score: number;
-}
 
 const db: Database<Scores> = new Database();
 
@@ -27,7 +11,11 @@ const getNextId = async (tableName: string) => {
     return id + 1;
 }
 
-
+interface Scores {
+    id: number;
+    address: string;
+    score: number;
+}
 /**
  * Takes a tableName and returns an array of Scores.
  *
@@ -38,11 +26,23 @@ const getScores = async (tableName: string) => {
     return results;
 }
 
-const postScore = async (tableName: string) => {
+/**
+ * Takes a tableName and Score and attempts to post to the Table
+ *
+ * @param tableName - A fully qualified table Name: `{prefix}_{chain_id}_{contract_id}`
+ * @param score - A number representative of the game's native scoring mechanism
+ */
+const postScore = async (tableName: string, score: number) => {
     const nextId = getNextId(tableName);
+    // Grab the provider from the browser
+    // Look into replacing this with more generic provider
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const player_address = provider.getSigner();
+
     const {meta: insert} = await db.prepare('INSERT INTO ${tableName} (id, address, score) VALUES (?,?,?);')
-        .bind(nextId, )
+        .bind(nextId, player_address.getAddress(), score)
         .run();
 }
 
-export {getScores}
+export {getScores, postScore}
