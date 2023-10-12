@@ -2,7 +2,7 @@ use std::error::Error;
 use std::time::Instant;
 
 #[derive(PartialEq, Debug)]
-enum ChangeEvent {
+pub enum ChangeEvent {
     Up,
     Down,
     Left,
@@ -12,12 +12,12 @@ enum ChangeEvent {
 }
 
 #[derive(PartialEq, Debug)]
-struct EventLog{
+pub struct EventLog{
     change: ChangeEvent,
     time: Instant
 }
 
-fn create_event(event: ChangeEvent) -> Result<EventLog,Box<dyn Error>> {
+pub fn create_event(event: ChangeEvent) -> Result<EventLog,Box<dyn Error>> {
     let event_log = EventLog {
         change: event,
         time: std::time::Instant::now(),

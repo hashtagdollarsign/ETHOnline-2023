@@ -1,7 +1,8 @@
 mod events;
 
-use lambda_http::{run, service_fn, Error, Request, Response, IntoResponse};
+use lambda_http::{run, service_fn, Error, Request, Response, IntoResponse, RequestExt, RequestPayloadExt};
 use serde_json::json;
+use crate::events::ChangeEvent;
 
 /// This is the main body for the function.
 /// Write your code inside it.
