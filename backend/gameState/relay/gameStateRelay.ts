@@ -1,9 +1,6 @@
-
-import WebSocket from 'ws';
-import * as config from '../../config.json';
-
-
-enum gameState {
+import config from '../../config.json';
+const { websocketServer } = config;
+enum GameState {
     Up = "Up",
     Down = "Down",
     Left = "Left",
@@ -14,7 +11,26 @@ enum gameState {
     Y = "Y",
 }
 
-const ws = new WebSocket(config.websocketServer)
+const ws = new WebSocket(websocketServer);
 
-let myState = gameState.X;
-ws.send(myState);
+ws.addEventListener("open", (event) => {
+    console.log("Connected to Server.");
+});
+
+ws.addEventListener("message", (event) => {
+    console.log(event);
+});
+
+const sendEvent = (event: GameState) => {
+    const sendData = JSON.stringify({
+        action: "game",
+        game_move: event
+    })
+
+    ws.send(sendData);
+    console.log("sent.");
+}
+
+
+
+export {GameState, sendEvent}
