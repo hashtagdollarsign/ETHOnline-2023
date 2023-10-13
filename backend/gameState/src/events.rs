@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::fmt::{Display, Formatter};
 use std::time::Instant;
 
 #[derive(PartialEq, Debug)]
@@ -9,12 +10,22 @@ pub enum ChangeEvent {
     Right,
     A,
     B,
+    X,
+    Y,
+    UnRegisteredMove,
 }
+
 
 #[derive(PartialEq, Debug)]
 pub struct EventLog{
     change: ChangeEvent,
     time: Instant
+}
+
+impl Display for EventLog {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f,"change: {:?}\ntime:{:?}", self.change, self.time )
+    }
 }
 
 pub fn create_event(event: ChangeEvent) -> Result<EventLog,Box<dyn Error>> {
