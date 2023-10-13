@@ -3,8 +3,12 @@
     "module": "commonjs",
     "target": "ES2015",
     "sourceMap": true,
-    "lib": ["ES2018"],
-    "moduleResolution": "node"
+    "lib": [
+      "ES2018",
+      "dom"
+    ],
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   },
   "exclude": [
     "node_modules"
