@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use lambda_http::{ service_fn, Error};
 use lambda_runtime::LambdaEvent;
 use crate::de_hasher::EventLogData;
-use base64::{Engine as _, alphabet, engine::{self, general_purpose}};
+use base64::{Engine as _, engine::{self, general_purpose}};
 
 #[derive(Deserialize, Serialize)]
 struct Request {
@@ -19,7 +19,7 @@ struct RequestBinary {
 impl Request {
     fn to_binary(&self) -> Result<Vec<u8>, base64::DecodeError> {
         let decoded_data = general_purpose::STANDARD
-            .decode(&self.hashed_data).unwrap();
+            .decode(&self.hashed_data).expect("failed to convert string to binary.");
         Ok(decoded_data)
     }
 }
