@@ -1,16 +1,29 @@
 mod de_hasher;
 
-
 use serde::{Deserialize, Serialize};
 use lambda_http::{ service_fn, Error};
 use lambda_runtime::LambdaEvent;
 use crate::de_hasher::EventLogData;
-
+use base64::{Engine as _, alphabet, engine::{self, general_purpose}};
 
 #[derive(Deserialize, Serialize)]
 struct Request {
     hashed_data: String,
 }
+
+#[derive(Deserialize, Serialize)]
+struct RequestBinary {
+    hashed_data: Vec<u8>,
+}
+
+impl Request {
+    fn to_binary(&self) -> Result<Vec<u8>, base64::DecodeError> {
+        let decoded_data = general_purpose::STANDARD
+            .decode(&self.hashed_data).unwrap();
+        Ok(decoded_data)
+    }
+}
+
 #[derive(Serialize)]
 struct Response {
     req_id: String,
@@ -18,9 +31,10 @@ struct Response {
 }
 
 async fn my_handler(event: LambdaEvent<Request>) -> Result<Response, Error> {
+
+    let converted_data = event.payload.to_binary().unwrap();
     let de_hashed_data = de_hasher::decrypt_data(
-        event.payload.hashed_data
-            .into()
+            converted_data
     )
         .expect("Failed to decrypt data");
     // prepare the response
