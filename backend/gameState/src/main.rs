@@ -1,4 +1,5 @@
 mod events;
+mod rds;
 
 use lambda_http::{ service_fn, Error};
 use lambda_runtime::LambdaEvent;
