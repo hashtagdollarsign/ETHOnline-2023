@@ -1,14 +1,32 @@
+
 use std::env;
+use crate::events::EventLog;
+use tokio_postgres::{NoTls, Error};
 
-pub fn idk_yet() {
-    let user_name = env::var("RDS_USERNAME")
-        .expect("User Name not found in environment");
-    let password = env::var("RDS_PASSWORD")
-        .expect("Password not found in environment");
-    let rds_proxy_host = env::var("RDS_PROXY_HOST")
-        .expect("Proxy Host not found in environment");
-    let db_name = env::var("RDS_DB_NAME")
-        .expect("Database Name not found in environment");
+pub async fn insert_into_rds(event: &EventLog) -> Result<(), Error> {
+
+    let db_name = env::var("DB_NAME").unwrap();
+    let username = env::var("USER_NAME").unwrap();
+    let password = env::var("PASSWORD").unwrap();
+    let connection_string = env::var("DB_ENDPOINT").unwrap();
+
+    let sql_stmnt =
+        "INSERT INTO raw_events (event, timestamp) values ($1,$2);";
+
+    let connection_url = format!("postgresql://{username}:{password}@{connection_string}");
+    let (client, connection) = tokio_postgres::connect(&connection_url, NoTls).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}",e)
+        }
+    });
 
 
+    client.execute(
+        sql_stmnt,
+        &[&event.change.to_string(), &event.time.to_string()]
+    );
+
+    Ok(())
 }

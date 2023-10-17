@@ -1,3 +1,5 @@
+extern crate core;
+
 mod events;
 mod rds;
 
@@ -31,11 +33,12 @@ async fn my_handler(event: LambdaEvent<Request>) -> Result<Response, Error> {
     let record  = events::create_event(state_change)
         .expect("Attach a timestamp to event");
 
+    let respo = rds::insert_into_rds(&record).await;
 
     // prepare the response
     let resp = Response {
         req_id: event.context.request_id,
-        msg: format!("Command {} executed.", record),
+        msg: format!("Command {:?} executed.", respo.unwrap()),
     };
     Ok(resp)
 }
