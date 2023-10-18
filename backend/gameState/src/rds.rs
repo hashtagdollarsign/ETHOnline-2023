@@ -13,7 +13,7 @@ pub async fn insert_into_rds(event: &EventLog) -> Result<(), Error> {
 
 
     let connection_url = format!("postgresql://{username}:{password}@{db_endpoint}");
-    let config = format!("user={username} password={password} host={db_endpoint} port=5432 dbname={db_name}");
+    let config = format!("user={username} password={password} host={db_endpoint} port=5432 dbname={db_name} sslmode=require");
 
 
 
