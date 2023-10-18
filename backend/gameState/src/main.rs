@@ -38,7 +38,7 @@ async fn my_handler(event: LambdaEvent<Request>) -> Result<Response, Error> {
     // prepare the response
     let resp = Response {
         req_id: event.context.request_id,
-        msg: format!("Command {:?} executed.", respo.unwrap()),
+        msg: format!("Rows affected {:?}", respo),
     };
     Ok(resp)
 }
