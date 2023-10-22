@@ -27,20 +27,28 @@ class GameStateServer {
         });
     }
 
-    public send_event = (event: GameState) => {
+    public get_id = () => {
+        const sendData = JSON.stringify({
+            action: "id",
+        })
+
+        this.ws.send(sendData);
+    }
+    public send_event = (event: GameState, game_id:Number) => {
         const sendData = JSON.stringify({
             action: "game",
-            game_move: event
+            game_move: event,
+            game_id: game_id
         })
 
         this.ws.send(sendData);
         console.log("sent.");
     }
 
-    public hash = () => {
+    public hash = (game_id:Number) => {
         const sendData = JSON.stringify({
             action: "hash",
-            data: "Not implemented yet"
+            id: game_id
         })
 
         this.ws.send(sendData);
