@@ -24,7 +24,7 @@ pub enum ChangeEvent {
 #[derive(PartialEq, Debug, Deserialize, Serialize, Hash)]
 pub struct EventLog{
     change: ChangeEvent,
-    time: Duration
+    time: i64
 }
 
 #[derive(Deserialize, Debug, PartialEq, Serialize, Hash)]

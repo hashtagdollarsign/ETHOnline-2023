@@ -38,7 +38,7 @@ async fn main() -> Result<(), Error> {
     Ok(())
 }
 async fn my_handler(event: LambdaEvent<Request>) -> Result<Response, Error> {
-    let data = retriever::json_retrieve().expect("Could not grab data");
+    let data = retriever::postgres_retrieve().await.expect("Could not grab data");
     let hashed_data = hasher::encrypt_data(data).unwrap();
 
     let resp = Response {

@@ -1,10 +1,9 @@
-use std::fs::File;
+
 use std::fmt::Formatter;
-use std::time::Duration;
 use serde::{Deserialize,Serialize};
 use std::fmt::Display;
-use std::error::Error;
-use std::io::Read;
+use std::env;
+use tokio_postgres::{NoTls, Error};
 
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -20,11 +19,28 @@ pub enum ChangeEvent {
     UnRegisteredMove,
 }
 
+impl ChangeEvent {
+    pub fn from_str(input: &str) -> Result<ChangeEvent, String> {
+        match input {
+            "Up" => Ok(ChangeEvent::Up),
+            "Down" => Ok(ChangeEvent::Down),
+            "Left" => Ok(ChangeEvent::Left),
+            "Right" => Ok(ChangeEvent::Right),
+            "A" => Ok(ChangeEvent::A),
+            "B" => Ok(ChangeEvent::B),
+            "X" => Ok(ChangeEvent::X),
+            "Y" => Ok(ChangeEvent::Y),
+            "UnRegisteredMove" => Ok(ChangeEvent::UnRegisteredMove),
+            _ => Err("Invalid ChangeEvent string".to_string()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct EventLog{
     change: ChangeEvent,
-    time: Duration
+    time: i64
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -38,16 +54,55 @@ impl Display for EventLog {
 }
 
 // This will have to be changed to grab from RDS
-pub fn json_retrieve() -> Result<EventLogData, Box<dyn Error>> {
+pub async fn postgres_retrieve()
+    -> Result<EventLogData, Error>
+{
 
-    let mut file = File::open("./mock_data.json").unwrap();
-    let mut data = String::new();
-    file.read_to_string(&mut data).unwrap();
-    let data: EventLogData = serde_json::from_str(&data).expect("JSON was not well-formatted");
+    let db_name = env::var("DB_NAME").unwrap();
+    let username = env::var("USER_NAME").unwrap();
+    let password = env::var("PASSWORD").unwrap();
+    let db_endpoint = env::var("DB_ENDPOINT").unwrap();
+
+    let connection_url = format!("postgresql://{username}:{password}@{db_endpoint}:5432/{db_name}");
+
+    let (client, connection) = tokio_postgres::connect(&connection_url, NoTls).await
+        .expect("failed here");
+
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}",e)
+        }
+    });
+
+    let sql_stmnt = format!("SELECT move, time_in_seconds FROM POSTGRES.RAW_EVENTS.RAW_GAME_EVENTS;");
+
+    let rows = client.query (&sql_stmnt, &[])
+        .await?;
+
+
+    let mut to_be_hashed: Vec<EventLog> = vec![];
+
+    for row in rows {
+
+        let game_move: &str = row.get(0);
+        let timeing:i64 = row.get(1) ;
+
+
+        let event_log = EventLog {
+            change: ChangeEvent::from_str(game_move).unwrap(),
+            time: timeing,
+        };
+
+        to_be_hashed.push(event_log);
+    }
+
+    let data = EventLogData {
+        data: to_be_hashed,
+    };
 
     Ok(data)
 }
-
 
 
 #[cfg(test)]
